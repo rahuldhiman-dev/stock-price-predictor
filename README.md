@@ -166,4 +166,4 @@ This project is licensed under the GNU General Public License v3.0. See the [LIC
 
 ## Author
 
-Rahul Dhiman ([GitHub](https://github.com/rahuldhiman509))
+Rahul Dhiman ([GitHub](https://github.com/{{USERNAME}}))
