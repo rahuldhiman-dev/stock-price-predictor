@@ -9,6 +9,7 @@ import pandas as pd
 # --- Streamlit Config ---
 st.set_page_config(page_title="Stock Price Predictor", page_icon="📈", layout="wide")
 st.title("📈 Stock Price Prediction using LSTM")
+st.page_link("pages/01_About.py", label="About this app", icon="ℹ️")
 
 # --- Sidebar Inputs ---
 ticker = st.sidebar.text_input("Enter Stock Ticker (e.g., AAPL)", "AAPL").upper()

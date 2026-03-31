@@ -10,10 +10,11 @@ TICKER = "AAPL"
 START_DATE = "2015-01-01"
 END_DATE = "2024-01-01"
 MODEL_PATH = "model/lstm_model.h5"
+SEQUENCE_LENGTH = 60
 
 # Step 1: Load + preprocess
 close_data, raw_data = download_data(TICKER, START_DATE, END_DATE)
-X, y, scaler = preprocess_data(close_data)
+X, y, scaler = preprocess_data(close_data, sequence_length=SEQUENCE_LENGTH)
 
 # Step 2: Train/test split
 split = int(len(X) * 0.8)
@@ -34,6 +35,6 @@ actual = scaler.inverse_transform(y_test.reshape(-1, 1))
 plot_predictions(actual, predictions, TICKER)
 
 # Step 5: Predict next day
-last_60 = scaler.transform(close_data[-60:])
-next_day_price = predict_next(MODEL_PATH, last_60, scaler)
+last_window = scaler.transform(close_data[-SEQUENCE_LENGTH:])
+next_day_price = predict_next(model, last_window, scaler)
 print(f"Predicted next {TICKER} closing price: ${next_day_price:.2f}")
