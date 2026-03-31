@@ -5,6 +5,7 @@ from src.predictor import predict_next
 from src.utils import plot_predictions
 import numpy as np
 import pandas as pd
+from datetime import date, timedelta
 
 # --- Streamlit Config ---
 st.set_page_config(page_title="Stock Price Predictor", page_icon="📈", layout="wide")
@@ -13,13 +14,34 @@ st.page_link("pages/01_About.py", label="About this app", icon="ℹ️")
 
 # --- Sidebar Inputs ---
 ticker = st.sidebar.text_input("Enter Stock Ticker (e.g., AAPL)", "AAPL").upper()
-start_date = st.sidebar.date_input("Start Date", pd.to_datetime("2015-01-01"))
-end_date = st.sidebar.date_input("End Date", pd.to_datetime("2024-01-01"))
+today = date.today()
+preset_options = {
+    "YTD": (date(today.year, 1, 1), today),
+    "1Y": (today - timedelta(days=365), today),
+    "5Y": (today - timedelta(days=365 * 5), today),
+    "10Y": (today - timedelta(days=365 * 10), today),
+    "20Y": (today - timedelta(days=365 * 20), today),
+    "Custom": None,
+}
+preset = st.sidebar.selectbox("Date Range Preset", list(preset_options.keys()), index=2)
+
+if preset == "Custom":
+    start_date = st.sidebar.date_input("Start Date", today - timedelta(days=365 * 5), max_value=today, key="start_date_custom")
+    end_date = st.sidebar.date_input("End Date", today, max_value=today, key="end_date_custom")
+else:
+    start_date, end_date = preset_options[preset]
+    st.sidebar.write(f"Using {preset}: {start_date} → {end_date}")
+
+if start_date >= end_date:
+    st.sidebar.error("Start date must be before end date.")
 sequence_length = st.sidebar.slider("Lookback Window (Days)", 30, 100, 60)
 epochs = st.sidebar.slider("Training Epochs", 5, 50, 20)
 predict_button = st.sidebar.button("Train & Predict")
 
 if predict_button:
+    if start_date >= end_date:
+        st.error("Start date must be before end date.")
+        st.stop()
     with st.spinner("🔄 Downloading data..."):
         close_data, raw_data = download_data(ticker, str(start_date), str(end_date))
         st.success(f"Downloaded {len(close_data)} records.")
